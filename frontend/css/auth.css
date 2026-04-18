@@ -1,0 +1,134 @@
+:root {
+  --bg: #0f172a;
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --accent: #8b5cf6;
+  --accent-hover: #a78bfa;
+  --text: #f8fafc;
+}
+
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at top right, #2e1065, transparent),
+    radial-gradient(circle at bottom left, #1e3a8a, transparent);
+  color: var(--text);
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(16px);
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.tabs {
+  display: flex;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 5px;
+  border-radius: 14px;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 2;
+  transition: color 0.3s;
+}
+
+.tab-btn.active {
+  color: white;
+}
+
+.slider {
+  position: absolute;
+  width: calc(50% - 5px);
+  height: calc(100% - 10px);
+  background: var(--accent);
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+input {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px;
+  color: white;
+  outline: none;
+  transition: all 0.3s;
+}
+
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+}
+
+.submit-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.submit-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.signup-only {
+  display: none;
+}
+
+#error-msg {
+  color: #ef4444;
+  font-size: 0.85rem;
+  text-align: center;
+  min-height: 1.2rem;
+}
