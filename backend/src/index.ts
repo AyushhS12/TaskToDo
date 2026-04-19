@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    methods: ["POST", "GET", "OPTIONs", "DELETE"],
+    methods: ["POST", "GET", "OPTIONs", "DELETE", "PUT"],
     credentials: true,
     origin: "http://localhost:5500"
 }))
@@ -38,9 +38,7 @@ app.post("/login", async (req, res) => {
         });
     }
     const token = sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || "HELLO");
-    if(req.cookies){
-        req.cookies["token"] = ""
-    }
+    res.clearCookie("token")
     return res.cookie("token", token, {
         httpOnly: true, secure: false, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }).status(200).json({ "message": "Logged in successfully" });
@@ -88,7 +86,7 @@ protectedRoutes.post("/create", async (req, res) => {
         if (result.rowCount && result.rowCount === 1) {
             res.status(201).json({
                 "message": "Todo Created Successfully",
-                "todo":result.rows[0]
+                "todo": result.rows[0]
             })
         }
     } catch (e) {
@@ -98,17 +96,23 @@ protectedRoutes.post("/create", async (req, res) => {
 })
 
 protectedRoutes.delete("/delete", async (req, res) => {
-    const { id } = req.body
+    const { id , user_id} = req.body
     if (!id) {
         return res.status(400).json({
             "error": "Invalid data"
         })
     }
-    const user_id = (decode(req.cookies.token) as { id: number, email: string }).id
+    const user = (decode(req.cookies.token) as { id: number, email: string })
+    console.log("user_id: " + user_id + "\nuser: " + user)
+    if(!(user_id === user.id)){
+        return res.status(400).json({
+            "error":"User id mismatch"
+        })
+    }
     try {
-        const result = await db.query("DELETE FROM todos WHERE id = $1 AND user_id = $2", [id, user_id]);
+        const result = await db.query("DELETE FROM todos WHERE id = $1 AND user_id = $2", [id, user.id]);
         if (result.rowCount && result.rowCount === 1) {
-            res.status(201).json({
+            res.status(200).json({
                 "message": "Todo Deleted Successfully"
             })
         }
@@ -151,10 +155,33 @@ protectedRoutes.get("/all", async (req, res) => {
             })
         } else {
             return res.status(200).json({
-                "message": "no todos were found"
+                "message": "no todos were found",
+                "todos": []
             })
         }
     } catch (e) {
+        return res.status(500)
+    }
+})
+
+protectedRoutes.put("/complete", async (req, res) => {
+    const { id, user_id } = req.body
+    if (!id || !user_id) {
+        return res.status(400).json({
+            "error": "Invalid data"
+        })
+    }
+    try {
+        const query = "UPDATE todos SET completed = NOT completed WHERE id = $1 AND user_id = $2 RETURNING *"
+        const result = await db.query<Todo>(query, [id, user_id]);
+        if (result.rowCount && result.rowCount === 1) {
+            return res.status(200).json({
+                "message": "Todo Completed",
+                "todo": result.rows[0]
+            })
+        }
+    } catch (e) {
+        console.log(e)
         return res.status(500)
     }
 })

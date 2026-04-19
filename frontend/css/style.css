@@ -17,11 +17,15 @@
 
 body {
   background-color: var(--bg);
-  background-image: 
+  background-image:
     radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15), transparent),
     radial-gradient(circle at 90% 80%, rgba(30, 58, 138, 0.2), transparent);
   color: var(--text);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -134,8 +138,18 @@ textarea:focus {
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-check.completed-btn {
+  background: green;
 }
 
 .todo-item:hover {
@@ -147,6 +161,7 @@ textarea:focus {
 .todo-info {
   flex-grow: 1;
   margin-right: 1rem;
+  min-width: 0;
 }
 
 .todo-info h3 {
@@ -160,6 +175,41 @@ textarea:focus {
   font-size: 0.95rem;
   color: #94a3b8;
   line-height: 1.5;
+}
+
+/* Container for the description logic */
+.desc-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.todo-desc {
+    max-height: 40px; /* adjust based on your design */
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    word-break: break-word;
+}
+
+.desc-container.expanded .todo-desc {
+    max-height: 500px; /* big enough to show full content */
+}
+
+/* Style the expand button */
+.btn-expand {
+    background: none;
+    border: none;
+    color: var(--accent-hover);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    width: fit-content;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.btn-expand:hover {
+    text-decoration: underline;
 }
 
 .todo-actions {
@@ -271,6 +321,10 @@ textarea:focus {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

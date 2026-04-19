@@ -1,32 +1,46 @@
 let todos = [];
 const renderTodos = () => {
     list.innerHTML = "";
+    if (todos.length == 0) return;
     todos.forEach((x) => {
-        list.innerHTML += `<li class="todo-item">
-                                        <div class="todo-info">
-                                            <h3>${x.title}</h3>
-                                            <p>${x.description}</p>
-                                        <div class="todo-actions">
-                                            <button class="action-btn btn-check">✓</button>
-                                            <button class="action-btn btn-edit" id="edit-btn" onclick="openEditModal(${x.id})">✎</button>
-                                            <button class="action-btn btn-delete">✕</button>
-                                        </div>
-                                    </li>`;
+        list.innerHTML += `<li class="todo-item" data-id="${x.id}">
+    <div class="todo-info">
+        <h3>${x.title}</h3>
+        <div class="desc-container">
+            <p class="todo-desc">${x.description}</p>
+            ${x.description.length > 50 ? `<button class="btn-expand">Read more</button>` : ''}
+        </div>
+    </div>
+    <div class="todo-actions">
+        <button class="action-btn btn-check ${x.completed ? "completed-btn" : ""}" onclick="handleCompleteBtn(this,${x.id},${x.user_id})">
+            ${x.completed ? "✔" : "✓"}
+        </button>
+        <button class="action-btn btn-edit" onclick="openEditModal(${x.id})">✎</button>
+        <button class="action-btn btn-delete" onclick="handleDeleteTodo(${x.id},${x.user_id})">✕</button>
+    </div>
+</li>`;
     });
 };
-const updateTodos = (todo) => {
-    todos.push(todo);
-    list.innerHTML += `<li class="todo-item">
-                                        <div class="todo-info">
-                                            <h3>${todo.title}</h3>
-                                            <p>${todo.description}</p>
-                                        <div class="todo-actions">
-                                            <button class="action-btn btn-check">✓</button>
-                                            <button class="action-btn btn-edit" id="edit-btn" onclick="openEditModal(${todo.id})">✎</button>
-                                            <button class="action-btn btn-delete">✕</button>
-                                        </div>
-                                    </li>`;
+const updateTodos = (x) => {
+    todos.push(x);
+    list.innerHTML += `<li class="todo-item" data-id="${x.id}">
+    <div class="todo-info">
+        <h3>${x.title}</h3>
+        <div class="desc-container">
+            <p class="todo-desc">${x.description}</p>
+            ${x.description.length > 50 ? `<button class="btn-expand" onclick="toggleExpand(this)">Read more</button>` : ''}
+        </div>
+    </div>
+    <div class="todo-actions">
+        <button class="action-btn btn-check ${x.completed ? "completed-btn" : ""}" onclick="handleCompleteBtn(this,${x.id},${x.user_id})">
+            ${x.completed ? "✔" : "✓"}
+        </button>
+        <button class="action-btn btn-edit" onclick="openEditModal(${x.id},${x.user_id})">✎</button>
+        <button class="action-btn btn-delete">✕</button>
+    </div>
+</li>`;
 };
+
 window.onload = async () => {
     try {
         const response = await fetch("http://localhost:8080/todo/all", {
@@ -43,11 +57,38 @@ window.onload = async () => {
         // Call a function to render your UI now that you have data
         renderTodos();
     } catch (e) {
+        // This line is for Debugging
+        // console.log("Real Error: ",e.message);
         console.log("Auth failed, redirecting...");
         window.location.href = "/auth.html";
     }
 };
 const list = document.getElementById("todo-list");
+
+// Toggle Complete property of the todo
+const completedBtn = document.getElementById("completed")
+
+const handleCompleteBtn = async (btn, id, user_id) => {
+    try {
+        const response = await fetch(`http://localhost:8080/todo/complete`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, user_id }),
+        });
+        if (!response.ok) {
+            throw new Error("Update Failed")
+            return
+        }
+        const index = todos.findIndex((t) => t.id == id);
+        todos[index].completed = !todos[index].completed;
+
+        renderTodos()
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 const titleInput = document.getElementById("todo-title");
 const descriptionInput = document.getElementById("todo-desc");
 const button = document.getElementById("add-btn");
@@ -74,6 +115,33 @@ button.addEventListener("click", async () => {
     }
 });
 
+// For Expanding the Description Text
+
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("btn-expand")) {
+        const btn = e.target;
+        const container = btn.parentElement;
+
+        container.classList.toggle("expanded");
+
+        btn.innerText = container.classList.contains("expanded")
+            ? "Show less"
+            : "Read more";
+    }
+});
+
+document.querySelectorAll('.desc-container').forEach(container => {
+    const text = container.querySelector('.todo-desc');
+    const btn = container.querySelector('.btn-expand');
+
+    if (!btn) return;
+
+    if (text.scrollHeight <= text.clientHeight) {
+        btn.style.display = 'none'; // no overflow → hide button
+    }
+});
+
+// To control the Modal and edit the todo
 const modal = document.getElementById("editModal");
 const closeModal = document.getElementById("closeModal");
 const saveEditBtn = document.getElementById("save-edit-btn");
@@ -125,3 +193,25 @@ saveEditBtn.onclick = async () => {
         alert("Failed to update todo");
     }
 };
+
+// Handle Delete
+
+const handleDeleteTodo = async (id,user_id) => {
+    try {
+        const response = await fetch(`http://localhost:8080/todo/delete`, {
+            method: "DELETE",
+            credentials: "include", 
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, user_id }),
+        });
+
+        console.log(await response.json())
+        if (!response.ok) throw new Error("Delete failed");
+        // Update local state
+        todos = todos.filter(t => t.id != id);
+
+        renderTodos()
+    } catch (e) {
+        console.log(e)
+    }
+}
