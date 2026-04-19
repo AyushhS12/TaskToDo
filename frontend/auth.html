@@ -86,6 +86,7 @@
         try {
             const response = await fetch("http://localhost:8080"+endpoint, {
                 method: 'POST',
+                credentials:"include",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
@@ -93,11 +94,12 @@
             const data = await response.json();
 
             if (response.ok) {
-                window.location.href = '/dashboard'; // Redirect on success
+                window.location.href = '/'; // Redirect on success
             } else {
                 document.getElementById('error-msg').innerText = data.error || "Something went wrong";
             }
         } catch (err) {
+            console.log(err)
             document.getElementById('error-msg').innerText = "Server connection failed";
         }
     });

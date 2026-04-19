@@ -1,48 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TaskTodo | Stay Productive</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div class="container">
-    <header>
-        <h1>TaskTodo</h1>
-    </header>
+    <div class="container">
+        <header>
+            <h1>TaskTodo</h1>
+        </header>
 
-    <div class="todo-input-group">
-        <input type="text" id="todo-title" placeholder="What needs to be done?">
-        <textarea id="todo-desc" placeholder="Add a description..."></textarea>
-        <button class="btn-add" id="add-btn">Add Task</button>
+        <div class="todo-input-group">
+            <input type="text" id="todo-title" placeholder="What needs to be done?">
+            <textarea id="todo-desc" placeholder="Add a description..."></textarea>
+            <button class="btn-add" id="add-btn">Add Task</button>
+        </div>
+
+        <ul id="todo-list">
+        </ul>
     </div>
 
-    <ul id="todo-list">
-        <li class="todo-item">
-            <div class="todo-info">
-                <h3>Practice Node.js</h3>
-                <p>Connect the backend with this cool UI.</p>
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Task</h2>
+                <button class="close-modal" id="closeModal">✕</button>
             </div>
-            <div class="todo-actions">
-                <button class="action-btn btn-check">✓</button>
-                <button class="action-btn btn-edit">✎</button>
-                <button class="action-btn btn-delete">✕</button>
-            </div>
-        </li>
-    </ul>
-</div>
-
-<script>
-    // window.onload = async () => {
-    //     fetch("http://localhost:8080/todo/all").then(async (val) => {
-    //         const res = await val.json()
-    //     }).catch(e => {
-
-    //     })
-    // }
-</script>
-
+            <input type="hidden" id="edit-id">
+            <input type="text" id="edit-title" placeholder="Title">
+            <textarea id="edit-desc" placeholder="Description"></textarea>
+            <button class="btn-add" id="save-edit-btn">Save Changes</button>
+        </div>
+    </div>
+    <script src="scripts/main.js"></script>
 </body>
+
 </html>
